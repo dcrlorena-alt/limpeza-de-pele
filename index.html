@@ -10,7 +10,8 @@
     --azul:#23366F;
     --rosa:#E5185F;
     --tinta:#2b2b3a;
-    --cor:#23366F; /* cor ativa do protocolo */
+    --cor:#23366F;      /* cor ativa do protocolo */
+    --rowh:56px;        /* altura de cada cartão (calculada por JS) */
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
@@ -18,50 +19,54 @@
     font-family:"Segoe UI", Arial, Helvetica, sans-serif;
     color:var(--tinta);
     background:#eef0f4;
-    height:100vh; overflow:hidden;
+    height:100vh; height:100dvh; overflow:hidden;
     display:flex; flex-direction:column;
   }
 
   header{
     background:var(--cor); color:#fff;
-    padding:10px 18px; box-shadow:0 2px 10px rgba(0,0,0,.25);
-    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+    padding:8px 16px; box-shadow:0 2px 10px rgba(0,0,0,.25);
+    display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px;
+    flex:0 0 auto;
   }
-  header h1{ font-size:clamp(16px,2.4vh,24px); font-weight:800; margin-right:8px; }
+  header h1{ font-size:clamp(15px,2.2vh,22px); font-weight:800; margin-right:6px; }
 
   .tabs{ display:flex; gap:6px; }
   .tab{
     border:none; cursor:pointer; font-weight:700;
-    padding:8px 14px; border-radius:20px; font-size:clamp(12px,1.8vh,16px);
+    padding:7px 13px; border-radius:20px; font-size:clamp(12px,1.7vh,15px);
     background:rgba(255,255,255,.18); color:#fff;
   }
   .tab.ativo{ background:#fff; color:var(--cor); }
 
-  .acoes{ margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+  .acoes{ margin-left:auto; display:flex; gap:7px; flex-wrap:wrap; }
+  .grupo{ border:none; border-radius:20px; padding:8px 13px; font-size:clamp(12px,1.7vh,15px); font-weight:600; width:140px; }
   .btn{
     border:none; cursor:pointer; font-weight:700; color:#fff;
-    padding:9px 16px; border-radius:20px; font-size:clamp(12px,1.8vh,16px);
+    padding:8px 14px; border-radius:20px; font-size:clamp(12px,1.7vh,15px);
     background:rgba(0,0,0,.22);
   }
   .btn.check{ background:var(--verde); }
   .btn.ver{ background:var(--rosa); }
   .btn:active{ transform:translateY(1px); }
+  .dica{ font-size:clamp(10px,1.5vh,13px); opacity:.85; flex-basis:100%; }
 
   .msg{
-    text-align:center; font-weight:700; padding:6px;
-    font-size:clamp(13px,2.1vh,20px); min-height:1.6em;
+    text-align:center; font-weight:700; padding:5px;
+    font-size:clamp(12px,1.9vh,19px); flex:0 0 auto;
   }
 
   .board{
-    flex:1 1 auto; display:flex; flex-direction:column; gap:8px;
-    padding:10px 18px 16px; overflow:hidden;
+    flex:1 1 auto; display:flex; flex-direction:column; gap:7px;
+    padding:8px 14px 12px; overflow:hidden;
   }
   .row{
-    flex:1 1 0; display:flex; align-items:center; gap:14px;
-    background:#fff; border-left:10px solid var(--cor);
-    border-radius:12px; padding:6px 14px;
+    height:var(--rowh); flex:0 0 auto;
+    display:flex; align-items:center; gap:12px;
+    background:#fff; border-left:9px solid var(--cor);
+    border-radius:11px; padding:4px 12px;
     box-shadow:0 2px 6px rgba(0,0,0,.10);
-    cursor:grab; user-select:none;
+    cursor:grab; user-select:none; overflow:hidden;
     transition:background .15s, transform .1s;
   }
   .row.dragging{ opacity:.45; }
@@ -70,25 +75,27 @@
   .row.err{ background:#fdeaf1; border-left-color:var(--rosa); }
 
   .num{
-    flex:0 0 auto; width:clamp(34px,5vh,54px); height:clamp(34px,5vh,54px);
+    flex:0 0 auto;
+    width:clamp(20px, calc(var(--rowh) * 0.62), 54px);
+    height:clamp(20px, calc(var(--rowh) * 0.62), 54px);
     border-radius:50%; background:var(--cor); color:#fff;
     display:flex; align-items:center; justify-content:center;
-    font-weight:800; font-size:clamp(16px,2.6vh,26px);
+    font-weight:800; font-size:clamp(12px, calc(var(--rowh) * 0.32), 26px);
   }
-  .txt{ flex:1 1 auto; font-weight:700; font-size:clamp(15px,2.8vh,30px); line-height:1.15; }
-  .ico{ flex:0 0 auto; font-size:clamp(16px,2.4vh,24px); opacity:.6; }
+  .txt{ flex:1 1 auto; font-weight:700; line-height:1.08;
+        font-size:clamp(12px, calc(var(--rowh) * 0.36), 30px); }
+  .ico{ flex:0 0 auto; opacity:.55; font-size:clamp(12px, calc(var(--rowh) * 0.30), 24px); }
 
-  .arrows{ flex:0 0 auto; display:flex; flex-direction:column; gap:4px; }
+  .arrows{ flex:0 0 auto; display:flex; flex-direction:column; gap:3px; }
   .arrow{
     border:none; cursor:pointer; background:var(--cor); color:#fff;
-    width:clamp(30px,4.4vh,44px); height:clamp(22px,3.1vh,32px);
-    border-radius:8px; font-size:clamp(12px,2vh,18px); font-weight:800;
+    width:clamp(24px, calc(var(--rowh) * 0.72), 44px);
+    height:clamp(13px, calc(var(--rowh) * 0.34), 32px);
+    border-radius:7px; font-weight:800;
+    font-size:clamp(10px, calc(var(--rowh) * 0.28), 18px);
     display:flex; align-items:center; justify-content:center;
   }
   .arrow:disabled{ opacity:.28; cursor:default; }
-
-  .grupo{ border:none; border-radius:20px; padding:9px 14px; font-size:clamp(12px,1.8vh,16px); font-weight:600; width:150px; }
-  .dica{ font-size:clamp(11px,1.7vh,14px); opacity:.85; }
 </style>
 </head>
 <body>
@@ -99,11 +106,11 @@
     <div class="acoes">
       <input id="grupo" class="grupo" placeholder="Grupo / Aluno" maxlength="30">
       <button class="btn" onclick="embaralhar()">🔀 Embaralhar</button>
-      <button class="btn" onclick="copiar()">📋 Copiar sequência</button>
+      <button class="btn" onclick="copiar()">📋 Copiar</button>
       <button class="btn check" onclick="verificar()">✅ Verificar</button>
-      <button class="btn ver" onclick="revelar()">👁️ Ver resposta</button>
+      <button class="btn ver" onclick="revelar()">👁️ Resposta</button>
     </div>
-    <div class="dica" style="flex-basis:100%">Arraste os cartões (ou use ▲▼) para colocar as etapas na ordem correta, depois clique em <b>Verificar</b>.</div>
+    <div class="dica">Arraste os cartões (ou use ▲▼) para ordenar as etapas e clique em <b>Verificar</b>.</div>
   </header>
 
   <div class="msg" id="msg">Escolha um tipo de limpeza e monte a sequência.</div>
@@ -130,7 +137,7 @@
   };
 
   var atual = 'super';
-  var ordem = [];        // arranjo corrente (array de strings)
+  var ordem = [];
   var dragFrom = -1;
 
   function correta(){ return decks[atual].passos; }
@@ -153,7 +160,6 @@
   function carregar(key){
     atual = key;
     document.documentElement.style.setProperty('--cor', decks[key].cor);
-    // embaralha garantindo que não comece já na ordem certa
     do { ordem = baralhar(decks[key].passos); }
     while (igual(ordem, decks[key].passos) && decks[key].passos.length > 1);
     marcarTabs();
@@ -164,8 +170,7 @@
   function embaralhar(){ carregar(atual); }
 
   function marcarTabs(){
-    var tabs = document.querySelectorAll('.tab');
-    tabs.forEach(function(t){
+    document.querySelectorAll('.tab').forEach(function(t){
       t.classList.toggle('ativo', t.getAttribute('data-k') === atual);
     });
   }
@@ -183,6 +188,22 @@
     render();
   }
 
+  // Calcula a altura dos cartões para caber tudo na tela SEM rolagem
+  function ajustar(){
+    var board = document.getElementById('board');
+    var rows = board.querySelectorAll('.row');
+    var n = rows.length;
+    if (!n) return;
+    var cs = getComputedStyle(board);
+    var padTop = parseFloat(cs.paddingTop) || 0;
+    var padBot = parseFloat(cs.paddingBottom) || 0;
+    var gap = parseFloat(cs.rowGap || cs.gap) || 7;
+    var avail = board.clientHeight - padTop - padBot;
+    var rowh = Math.floor((avail - gap * (n - 1)) / n);
+    if (rowh < 26) rowh = 26;
+    document.documentElement.style.setProperty('--rowh', rowh + 'px');
+  }
+
   function render(){
     var board = document.getElementById('board');
     board.innerHTML = '';
@@ -191,7 +212,6 @@
       row.className = 'row';
       row.setAttribute('draggable', 'true');
 
-      // Drag & drop
       row.addEventListener('dragstart', function(){ dragFrom = i; row.classList.add('dragging'); });
       row.addEventListener('dragend', function(){ dragFrom = -1; row.classList.remove('dragging'); });
       row.addEventListener('dragover', function(e){ e.preventDefault(); row.classList.add('over'); });
@@ -223,22 +243,7 @@
       row.appendChild(num); row.appendChild(txt); row.appendChild(ico); row.appendChild(arrows);
       board.appendChild(row);
     });
-  }
-
-  function verificar(){
-    var rows = document.querySelectorAll('.row');
-    var certos = 0;
-    var alvo = correta();
-    rows.forEach(function(row, i){
-      row.classList.remove('ok', 'err');
-      if (ordem[i] === alvo[i]){ row.classList.add('ok'); certos++; }
-      else { row.classList.add('err'); }
-    });
-    if (certos === alvo.length){
-      setMsg('🎉 Perfeito! Sequência correta da limpeza ' + decks[atual].nome + '!', 'var(--verde)');
-    } else {
-      setMsg('Você acertou ' + certos + ' de ' + alvo.length + '. Ajuste os cartões em vermelho e tente de novo!', 'var(--rosa)');
-    }
+    requestAnimationFrame(ajustar);
   }
 
   function copiar(){
@@ -263,14 +268,33 @@
     else setMsg('Copie manualmente: ' + texto.replace(/\n/g, '  |  '), 'var(--tinta)');
   }
 
+  function verificar(){
+    var rows = document.querySelectorAll('.row');
+    var certos = 0;
+    var alvo = correta();
+    rows.forEach(function(row, i){
+      row.classList.remove('ok', 'err');
+      if (ordem[i] === alvo[i]){ row.classList.add('ok'); certos++; }
+      else { row.classList.add('err'); }
+    });
+    if (certos === alvo.length){
+      setMsg('🎉 Perfeito! Sequência correta da limpeza ' + decks[atual].nome + '!', 'var(--verde)');
+    } else {
+      setMsg('Você acertou ' + certos + ' de ' + alvo.length + '. Ajuste os cartões em vermelho e tente de novo!', 'var(--rosa)');
+    }
+  }
+
   function revelar(){
     ordem = correta().slice();
     render();
-    document.querySelectorAll('.row').forEach(function(row){ row.classList.add('ok'); });
+    requestAnimationFrame(function(){
+      document.querySelectorAll('.row').forEach(function(row){ row.classList.add('ok'); });
+    });
     setMsg('✔️ Esta é a sequência correta da limpeza ' + decks[atual].nome + '.', 'var(--verde)');
   }
 
-  // Monta as abas de protocolo
+  window.addEventListener('resize', ajustar);
+
   (function(){
     var tabs = document.getElementById('tabs');
     Object.keys(decks).forEach(function(k){
