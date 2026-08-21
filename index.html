@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atividade — Sequência da Limpeza de Pele</title>
+<style>
+  :root{
+    --verde:#2E9E5B;
+    --azul:#23366F;
+    --rosa:#E5185F;
+    --tinta:#2b2b3a;
+    --cor:#23366F; /* cor ativa do protocolo */
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family:"Segoe UI", Arial, Helvetica, sans-serif;
+    color:var(--tinta);
+    background:#eef0f4;
+    height:100vh; overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+
+  header{
+    background:var(--cor); color:#fff;
+    padding:10px 18px; box-shadow:0 2px 10px rgba(0,0,0,.25);
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+  }
+  header h1{ font-size:clamp(16px,2.4vh,24px); font-weight:800; margin-right:8px; }
+
+  .tabs{ display:flex; gap:6px; }
+  .tab{
+    border:none; cursor:pointer; font-weight:700;
+    padding:8px 14px; border-radius:20px; font-size:clamp(12px,1.8vh,16px);
+    background:rgba(255,255,255,.18); color:#fff;
+  }
+  .tab.ativo{ background:#fff; color:var(--cor); }
+
+  .acoes{ margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+  .btn{
+    border:none; cursor:pointer; font-weight:700; color:#fff;
+    padding:9px 16px; border-radius:20px; font-size:clamp(12px,1.8vh,16px);
+    background:rgba(0,0,0,.22);
+  }
+  .btn.check{ background:var(--verde); }
+  .btn.ver{ background:var(--rosa); }
+  .btn:active{ transform:translateY(1px); }
+
+  .msg{
+    text-align:center; font-weight:700; padding:6px;
+    font-size:clamp(13px,2.1vh,20px); min-height:1.6em;
+  }
+
+  .board{
+    flex:1 1 auto; display:flex; flex-direction:column; gap:8px;
+    padding:10px 18px 16px; overflow:hidden;
+  }
+  .row{
+    flex:1 1 0; display:flex; align-items:center; gap:14px;
+    background:#fff; border-left:10px solid var(--cor);
+    border-radius:12px; padding:6px 14px;
+    box-shadow:0 2px 6px rgba(0,0,0,.10);
+    cursor:grab; user-select:none;
+    transition:background .15s, transform .1s;
+  }
+  .row.dragging{ opacity:.45; }
+  .row.over{ outline:3px dashed var(--cor); outline-offset:-3px; }
+  .row.ok{ background:#e5f6ec; border-left-color:var(--verde); }
+  .row.err{ background:#fdeaf1; border-left-color:var(--rosa); }
+
+  .num{
+    flex:0 0 auto; width:clamp(34px,5vh,54px); height:clamp(34px,5vh,54px);
+    border-radius:50%; background:var(--cor); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:clamp(16px,2.6vh,26px);
+  }
+  .txt{ flex:1 1 auto; font-weight:700; font-size:clamp(15px,2.8vh,30px); line-height:1.15; }
+  .ico{ flex:0 0 auto; font-size:clamp(16px,2.4vh,24px); opacity:.6; }
+
+  .arrows{ flex:0 0 auto; display:flex; flex-direction:column; gap:4px; }
+  .arrow{
+    border:none; cursor:pointer; background:var(--cor); color:#fff;
+    width:clamp(30px,4.4vh,44px); height:clamp(22px,3.1vh,32px);
+    border-radius:8px; font-size:clamp(12px,2vh,18px); font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .arrow:disabled{ opacity:.28; cursor:default; }
+
+  .grupo{ border:none; border-radius:20px; padding:9px 14px; font-size:clamp(12px,1.8vh,16px); font-weight:600; width:150px; }
+  .dica{ font-size:clamp(11px,1.7vh,14px); opacity:.85; }
+</style>
+</head>
+<body>
+
+  <header>
+    <h1>🧴 Sequência da Limpeza de Pele</h1>
+    <div class="tabs" id="tabs"></div>
+    <div class="acoes">
+      <input id="grupo" class="grupo" placeholder="Grupo / Aluno" maxlength="30">
+      <button class="btn" onclick="embaralhar()">🔀 Embaralhar</button>
+      <button class="btn" onclick="copiar()">📋 Copiar sequência</button>
+      <button class="btn check" onclick="verificar()">✅ Verificar</button>
+      <button class="btn ver" onclick="revelar()">👁️ Ver resposta</button>
+    </div>
+    <div class="dica" style="flex-basis:100%">Arraste os cartões (ou use ▲▼) para colocar as etapas na ordem correta, depois clique em <b>Verificar</b>.</div>
+  </header>
+
+  <div class="msg" id="msg">Escolha um tipo de limpeza e monte a sequência.</div>
+  <div class="board" id="board"></div>
+
+<script>
+  var decks = {
+    super: {
+      nome:'Superficial', cor:'#2E9E5B',
+      passos:['Higienização','Peeling superficial','Tonificar','Filtro solar']
+    },
+    media: {
+      nome:'Média', cor:'#23366F',
+      passos:['Higienização','Peeling (se necessário)','Desincruste (se necessário)',
+              'Emoliência','Extrações','Loção normalizadora',
+              'Alta Frequência','Ionização','Máscaras','Finalizadores']
+    },
+    prof: {
+      nome:'Profunda', cor:'#E5185F',
+      passos:['Higienização','Desincruste (se necessário)','Emoliência','Extrações',
+              'Peeling de Cristal ou Diamante','Loção normalizadora',
+              'Alta Frequência','Ionização','Máscaras','Finalizadores']
+    }
+  };
+
+  var atual = 'super';
+  var ordem = [];        // arranjo corrente (array de strings)
+  var dragFrom = -1;
+
+  function correta(){ return decks[atual].passos; }
+
+  function baralhar(arr){
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function igual(a, b){
+    if (a.length !== b.length) return false;
+    for (var i = 0; i < a.length; i++){ if (a[i] !== b[i]) return false; }
+    return true;
+  }
+
+  function carregar(key){
+    atual = key;
+    document.documentElement.style.setProperty('--cor', decks[key].cor);
+    // embaralha garantindo que não comece já na ordem certa
+    do { ordem = baralhar(decks[key].passos); }
+    while (igual(ordem, decks[key].passos) && decks[key].passos.length > 1);
+    marcarTabs();
+    setMsg('Monte a sequência da limpeza ' + decks[key].nome + '.', '');
+    render();
+  }
+
+  function embaralhar(){ carregar(atual); }
+
+  function marcarTabs(){
+    var tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function(t){
+      t.classList.toggle('ativo', t.getAttribute('data-k') === atual);
+    });
+  }
+
+  function setMsg(txt, cor){
+    var m = document.getElementById('msg');
+    m.textContent = txt;
+    m.style.color = cor || 'var(--tinta)';
+  }
+
+  function mover(from, to){
+    if (to < 0 || to >= ordem.length) return;
+    var item = ordem.splice(from, 1)[0];
+    ordem.splice(to, 0, item);
+    render();
+  }
+
+  function render(){
+    var board = document.getElementById('board');
+    board.innerHTML = '';
+    ordem.forEach(function(passo, i){
+      var row = document.createElement('div');
+      row.className = 'row';
+      row.setAttribute('draggable', 'true');
+
+      // Drag & drop
+      row.addEventListener('dragstart', function(){ dragFrom = i; row.classList.add('dragging'); });
+      row.addEventListener('dragend', function(){ dragFrom = -1; row.classList.remove('dragging'); });
+      row.addEventListener('dragover', function(e){ e.preventDefault(); row.classList.add('over'); });
+      row.addEventListener('dragleave', function(){ row.classList.remove('over'); });
+      row.addEventListener('drop', function(e){
+        e.preventDefault(); row.classList.remove('over');
+        if (dragFrom > -1 && dragFrom !== i) mover(dragFrom, i);
+      });
+
+      var num = document.createElement('div');
+      num.className = 'num'; num.textContent = (i + 1);
+
+      var txt = document.createElement('div');
+      txt.className = 'txt'; txt.textContent = passo;
+
+      var ico = document.createElement('div');
+      ico.className = 'ico'; ico.textContent = '⠿';
+
+      var arrows = document.createElement('div');
+      arrows.className = 'arrows';
+      var up = document.createElement('button');
+      up.className = 'arrow'; up.textContent = '▲'; up.disabled = (i === 0);
+      up.addEventListener('click', function(){ mover(i, i - 1); });
+      var dn = document.createElement('button');
+      dn.className = 'arrow'; dn.textContent = '▼'; dn.disabled = (i === ordem.length - 1);
+      dn.addEventListener('click', function(){ mover(i, i + 1); });
+      arrows.appendChild(up); arrows.appendChild(dn);
+
+      row.appendChild(num); row.appendChild(txt); row.appendChild(ico); row.appendChild(arrows);
+      board.appendChild(row);
+    });
+  }
+
+  function verificar(){
+    var rows = document.querySelectorAll('.row');
+    var certos = 0;
+    var alvo = correta();
+    rows.forEach(function(row, i){
+      row.classList.remove('ok', 'err');
+      if (ordem[i] === alvo[i]){ row.classList.add('ok'); certos++; }
+      else { row.classList.add('err'); }
+    });
+    if (certos === alvo.length){
+      setMsg('🎉 Perfeito! Sequência correta da limpeza ' + decks[atual].nome + '!', 'var(--verde)');
+    } else {
+      setMsg('Você acertou ' + certos + ' de ' + alvo.length + '. Ajuste os cartões em vermelho e tente de novo!', 'var(--rosa)');
+    }
+  }
+
+  function copiar(){
+    var nome = (document.getElementById('grupo').value || '').trim();
+    var linhas = ordem.map(function(p, i){ return (i + 1) + ') ' + p; });
+    var cab = (nome ? nome + ' — ' : '') + 'Limpeza ' + decks[atual].nome;
+    var texto = cab + '\n' + linhas.join('\n');
+    var ok = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto);
+        ok = true;
+      }
+    } catch (e) { ok = false; }
+    if (!ok) {
+      var ta = document.createElement('textarea');
+      ta.value = texto; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); ok = true; } catch (e2) { ok = false; }
+      document.body.removeChild(ta);
+    }
+    if (ok) setMsg('📋 Sua sequência foi copiada! Cole no chat da turma para discutir.', 'var(--verde)');
+    else setMsg('Copie manualmente: ' + texto.replace(/\n/g, '  |  '), 'var(--tinta)');
+  }
+
+  function revelar(){
+    ordem = correta().slice();
+    render();
+    document.querySelectorAll('.row').forEach(function(row){ row.classList.add('ok'); });
+    setMsg('✔️ Esta é a sequência correta da limpeza ' + decks[atual].nome + '.', 'var(--verde)');
+  }
+
+  // Monta as abas de protocolo
+  (function(){
+    var tabs = document.getElementById('tabs');
+    Object.keys(decks).forEach(function(k){
+      var b = document.createElement('button');
+      b.className = 'tab'; b.textContent = decks[k].nome;
+      b.setAttribute('data-k', k);
+      b.addEventListener('click', function(){ carregar(k); });
+      tabs.appendChild(b);
+    });
+    carregar('super');
+  })();
+</script>
+</body>
+</html>
