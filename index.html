@@ -48,7 +48,23 @@
   }
   .btn.check{ background:var(--verde); }
   .btn.ver{ background:var(--rosa); }
+  .btn.info{ background:#7a4fb5; }
   .btn:active{ transform:translateY(1px); }
+
+  /* Janela (overlay) da explicação */
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.55);
+    display:none; align-items:center; justify-content:center; padding:20px; z-index:100;
+  }
+  .overlay.aberto{ display:flex; }
+  .painel{
+    background:#fff; border-radius:16px; max-width:620px; width:100%;
+    max-height:90vh; overflow:auto; padding:26px 26px 22px;
+    box-shadow:0 12px 44px rgba(0,0,0,.35);
+  }
+  .painel h2{ color:var(--azul); font-size:22px; margin-bottom:14px; }
+  .painel p{ font-size:16px; line-height:1.55; margin-bottom:12px; }
+  .painel .fechar{ background:var(--azul); margin-top:6px; }
   .dica{ font-size:clamp(10px,1.5vh,13px); opacity:.85; flex-basis:100%; }
 
   .msg{
@@ -109,12 +125,24 @@
       <button class="btn" onclick="copiar()">📋 Copiar</button>
       <button class="btn check" onclick="verificar()">✅ Verificar</button>
       <button class="btn ver" onclick="revelar()">👁️ Resposta</button>
+      <button class="btn info" onclick="toggleInfo()">ℹ️ Média × Profunda</button>
     </div>
     <div class="dica">Arraste os cartões (ou use ▲▼) para ordenar as etapas e clique em <b>Verificar</b>.</div>
   </header>
 
   <div class="msg" id="msg">Escolha um tipo de limpeza e monte a sequência.</div>
   <div class="board" id="board"></div>
+
+  <div class="overlay" id="overlay" onclick="toggleInfo()">
+    <div class="painel" onclick="event.stopPropagation()">
+      <h2>🔍 Diferença: Média × Profunda</h2>
+      <p>As duas seguem a mesma lógica <b>ABRIR → TRATAR → FECHAR</b>. A diferença está em apenas <b>duas etapas</b>:</p>
+      <p>🔵 <b style="color:var(--azul)">Limpeza MÉDIA</b> — tem o <b>Peeling (esfoliação leve)</b> logo no <b>início</b>.</p>
+      <p>🔴 <b style="color:var(--rosa)">Limpeza PROFUNDA</b> — <b>não</b> tem o peeling inicial; em vez disso acrescenta o <b>Peeling de Cristal ou Diamante (microdermoabrasão)</b> logo <b>após as extrações</b>.</p>
+      <p>👉 É a <b>microdermoabrasão</b> que torna a limpeza "profunda": ela renova camadas mais espessas da pele. Por isso não se usa também o peeling leve — seria redundante e agressivo demais.</p>
+      <button class="btn fechar" onclick="toggleInfo()">Fechar</button>
+    </div>
+  </div>
 
 <script>
   var decks = {
@@ -291,6 +319,10 @@
       document.querySelectorAll('.row').forEach(function(row){ row.classList.add('ok'); });
     });
     setMsg('✔️ Esta é a sequência correta da limpeza ' + decks[atual].nome + '.', 'var(--verde)');
+  }
+
+  function toggleInfo(){
+    document.getElementById('overlay').classList.toggle('aberto');
   }
 
   window.addEventListener('resize', ajustar);
