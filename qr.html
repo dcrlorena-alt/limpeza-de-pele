@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code — Atividade Limpeza de Pele</title>
+<style>
+  :root{ --azul:#23366F; --rosa:#E5185F; --verde:#2E9E5B; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:"Segoe UI", Arial, Helvetica, sans-serif;
+    color:#2b2b3a; background:#eef0f4;
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:24px; text-align:center;
+  }
+  h1{ color:var(--azul); font-size:clamp(20px,4vw,32px); margin-bottom:6px; }
+  p.sub{ color:#555; font-size:clamp(13px,2.5vw,17px); margin-bottom:22px; }
+  .card{
+    background:#fff; border-radius:18px; padding:26px 26px 20px;
+    box-shadow:0 8px 30px rgba(0,0,0,.15);
+  }
+  #qr{ display:inline-block; }
+  #qr img, #qr canvas{ display:block; }
+  .link{
+    margin-top:16px; font-size:clamp(12px,2.5vw,16px); font-weight:700;
+    color:var(--azul); word-break:break-all;
+  }
+  .botoes{ margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .btn{
+    border:none; cursor:pointer; color:#fff; font-weight:700;
+    padding:12px 22px; border-radius:30px; font-size:15px;
+  }
+  .btn.baixar{ background:var(--verde); }
+  .btn.imprimir{ background:var(--rosa); }
+  .aviso{
+    margin-top:22px; max-width:520px; font-size:14px; color:#8a1030;
+    background:#fdeaf1; border-radius:10px; padding:14px; display:none;
+  }
+  @media print{
+    body{ background:#fff; }
+    .botoes, p.sub{ display:none; }
+    .card{ box-shadow:none; }
+  }
+</style>
+</head>
+<body>
+  <h1>🧴 Atividade — Sequência da Limpeza de Pele</h1>
+  <p class="sub">Aponte a câmera do celular para o QR Code e abra a atividade</p>
+
+  <div class="card">
+    <div id="qr"></div>
+    <div class="link" id="linkTxt"></div>
+    <div class="botoes">
+      <button class="btn baixar" onclick="baixar()">⬇️ Baixar PNG</button>
+      <button class="btn imprimir" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+  </div>
+
+  <div class="aviso" id="aviso">
+    Não consegui carregar o gerador de QR (sem internet?). Abra esta página com internet,
+    ou gere o QR gratuitamente colando o link em um site como <b>qr-code-generator.com</b>.
+    Link da atividade:<br><b id="linkFallback"></b>
+  </div>
+
+  <!-- Biblioteca de QR (carregada do navegador, que tem internet) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+  <script>
+    var URL_ATIVIDADE = "https://dcrlorena-alt.github.io/limpeza-de-pele/";
+    document.getElementById('linkTxt').textContent = URL_ATIVIDADE;
+    document.getElementById('linkFallback').textContent = URL_ATIVIDADE;
+
+    function gerar(){
+      if (typeof QRCode === 'undefined'){
+        document.getElementById('aviso').style.display = 'block';
+        return;
+      }
+      var tam = Math.min(420, Math.max(240, Math.floor(window.innerWidth * 0.7)));
+      new QRCode(document.getElementById('qr'), {
+        text: URL_ATIVIDADE,
+        width: tam,
+        height: tam,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    function baixar(){
+      var cont = document.getElementById('qr');
+      var canvas = cont.querySelector('canvas');
+      var img = cont.querySelector('img');
+      var dados = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+      if (!dados){ alert('O QR ainda não foi gerado. Verifique a internet e recarregue.'); return; }
+      var a = document.createElement('a');
+      a.href = dados;
+      a.download = 'qrcode-limpeza-de-pele.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    window.addEventListener('load', gerar);
+  </script>
+</body>
+</html>
